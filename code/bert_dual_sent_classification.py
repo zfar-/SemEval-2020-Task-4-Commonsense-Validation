@@ -65,6 +65,7 @@ class BertForDualSent(BertPreTrainedModel):
         self.rank_margin = nn.MarginRankingLoss(margin=0.4)
 
         self.classifier = nn.Linear(config.hidden_size, num_labels)
+        self.classifier_direct = nn.Linear(600, 1)
 
         self.init_weights()
 
@@ -90,6 +91,9 @@ class BertForDualSent(BertPreTrainedModel):
 
         cos_simi1 = self.cos(fused_sent, sent1)
         cos_simi2 = self.cos(fused_sent, sent2)
+
+        # cos_simi1 = self.classifier_direct(self.activation(torch.cat((sent1+fused_sent, sent1*fused_sent),dim=1)))
+        # cos_simi2 = self.classifier_direct(self.activation(torch.cat((sent2+fused_sent, sent2*fused_sent),dim=1)))
 
         outputs = (cos_simi1, cos_simi2), None, None
         if labels is not None:

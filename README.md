@@ -32,3 +32,9 @@ transformers 2.1.1
 ```shell
 python train.py
 ```
+
+## result:
+
+    BERT-base:  accuracy = 0.936
+    
+    BERT-large: accuracy = 0.942
