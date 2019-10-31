@@ -75,17 +75,18 @@ class BertForDualSent(BertPreTrainedModel):
         _, sent1 = self.bert(sent1)
         sent1 = self.activation(sent1)
         sent1 = self.pre_linear(sent1)
-        sent1 = self.dropout(sent1)
+        # sent1 = self.dropout(sent1)
 
         # try:
         ori = sent2
         _, sent2 = self.bert(sent2)
         sent2 = self.activation(sent2)
         sent2 = self.pre_linear(sent2)
-        sent2 = self.dropout(sent2)
+        # sent2 = self.dropout(sent2)
 
         fused_sent = torch.cat((sent1+sent2, sent1*sent2),dim=1)
         fused_sent = self.reduce_fuse_linear(fused_sent)
+        # fused_sent = self.dropout(fused_sent)
 
         cos_simi1 = self.cos(fused_sent, sent1)
         cos_simi2 = self.cos(fused_sent, sent2)

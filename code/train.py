@@ -111,6 +111,7 @@ def train(args, train_dataset: TensorDataset, model, dev_dataset: TensorDataset=
 
             tr_loss += loss.item()
             cur_loss = loss.item()
+            result = 0
             if (step + 1) % args.gradient_accumulation_steps == 0 and not args.tpu:
                 if args.fp16:
                     torch.nn.utils.clip_grad_norm_(amp.master_params(optimizer), args.max_grad_norm)
@@ -125,7 +126,13 @@ def train(args, train_dataset: TensorDataset, model, dev_dataset: TensorDataset=
                 if args.local_rank in [-1, 0] and args.logging_steps > 0 and global_step % args.logging_steps == 0:
                     # Log metrics
                     if args.local_rank == -1 and args.evaluate_during_training:  # Only evaluate when single GPU otherwise metrics may not average well
-                        results = evaluate(args, dev_dataset, model)
+                        new_result, pred_to_write = evaluate(args, dev_dataset, model)
+                        if new_result > result:
+                            result = new_result
+                            with open('./result/best.csv', 'w') as f:
+                                for i, r in enumerate(pred_to_write, 1):
+                                    f.write('%d,%d\n' % (i, int(r)))
+
                     logging_loss = tr_loss
                     print('loss=%f' % (tr_loss / global_step))
 
@@ -192,6 +199,9 @@ def evaluate(args, dev_dataset, model):
 
     result = np.equal(preds, out_label_ids).mean()
     print('accuracy = %f' % result)
+    # if max:
+
+
     # results.update(result)
 
     # output_eval_file = os.path.join(eval_output_dir, "eval_results.txt")
@@ -201,7 +211,7 @@ def evaluate(args, dev_dataset, model):
     #         print("  %s = %s", key, str(result[key]))
     #         writer.write("%s = %s\n" % (key, str(result[key])))
 
-    return results
+    return result, preds
 
 
 def main():
@@ -209,7 +219,7 @@ def main():
 
     parser.add_argument("--model_type", default='bert', type=str,
                         help="Model type selected in the list: " + ", ".join(MODEL_CLASSES.keys()))
-    parser.add_argument("--model_name_or_path", default='bert-base-uncased', type=str,
+    parser.add_argument("--model_name_or_path", default='bert-large-uncased', type=str,
                         help="Path to pre-trained model or shortcut name selected in the list: " + ", ".join(ALL_MODELS))
     parser.add_argument("--output_dir", default='exp', type=str,
                         help="The output directory where the model predictions and checkpoints will be written.")
@@ -228,16 +238,16 @@ def main():
                         help="Whether to run training.")
     parser.add_argument("--do_eval", action='store_true',
                         help="Whether to run eval on the dev set.")
-    parser.add_argument("--evaluate_during_training", action='store_true',
+    parser.add_argument("--evaluate_during_training", action='store_true', default=True,
                         help="Rul evaluation during training at each logging step.")
     parser.add_argument("--do_lower_case", action='store_true',
                         help="Set this flag if you are using an uncased model.")
 
-    parser.add_argument("--per_gpu_train_batch_size", default=64, type=int,
+    parser.add_argument("--per_gpu_train_batch_size", default=32, type=int,
                         help="Batch size per GPU/CPU for training.")
-    parser.add_argument("--per_gpu_eval_batch_size", default=64, type=int,
+    parser.add_argument("--per_gpu_eval_batch_size", default=32, type=int,
                         help="Batch size per GPU/CPU for evaluation.")
-    parser.add_argument('--gradient_accumulation_steps', type=int, default=1,
+    parser.add_argument('--gradient_accumulation_steps', type=int, default=2,
                         help="Number of updates steps to accumulate before performing a backward/update pass.")
     parser.add_argument("--learning_rate", default=5e-5, type=float,
                         help="The initial learning rate for Adam.")
@@ -312,7 +322,7 @@ def main():
     dev_eg = d.get_dev_examples(dev_dir_path)
     train_eg = d.get_train_examples(train_dir_path)
 
-    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+    tokenizer = BertTokenizer.from_pretrained('bert-large-uncased')
 
 
     train_dataset = convert_features_to_dataset(convert_examples_to_features(
@@ -328,6 +338,10 @@ def main():
     model.to(args.device)
     train(args, train_dataset, model, dev_dataset)
 
+    # if args.do_train:
+    #     train(args, train_dataset, model, dev_dataset)
+    # if args.do_eval:
+    #     results = evaluate(args, dev_dataset, model)
 if __name__ == "__main__":
 
     main()
