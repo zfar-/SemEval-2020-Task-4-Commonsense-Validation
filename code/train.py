@@ -257,7 +257,7 @@ def main():
                         help="Epsilon for Adam optimizer.")
     parser.add_argument("--max_grad_norm", default=1.0, type=float,
                         help="Max gradient norm.")
-    parser.add_argument("--num_train_epochs", default=10.0, type=float,
+    parser.add_argument("--num_train_epochs", default=2.0, type=float,
                         help="Total number of training epochs to perform.")
     parser.add_argument("--max_steps", default=-1, type=int,
                         help="If > 0: set total number of training steps to perform. Override num_train_epochs.")
@@ -316,8 +316,8 @@ def main():
 
 
     d = DataProcessor()
-    train_dir_path = './Training_Data'
-    dev_dir_path = './Trial_Data'
+    train_dir_path = 'SemEval-2020-Task-4-Commonsense-Validation/Training_Data'
+    dev_dir_path = 'SemEval-2020-Task-4-Commonsense-Validation/Trial_Data'
 
     dev_eg = d.get_dev_examples(dev_dir_path)
     train_eg = d.get_train_examples(train_dir_path)
