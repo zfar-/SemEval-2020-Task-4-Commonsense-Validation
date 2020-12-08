@@ -243,11 +243,11 @@ def main():
     parser.add_argument("--do_lower_case", action='store_true',
                         help="Set this flag if you are using an uncased model.")
 
-    parser.add_argument("--per_gpu_train_batch_size", default=32, type=int,
+    parser.add_argument("--per_gpu_train_batch_size", default=128, type=int,
                         help="Batch size per GPU/CPU for training.")
-    parser.add_argument("--per_gpu_eval_batch_size", default=32, type=int,
+    parser.add_argument("--per_gpu_eval_batch_size", default=128, type=int,
                         help="Batch size per GPU/CPU for evaluation.")
-    parser.add_argument('--gradient_accumulation_steps', type=int, default=2,
+    parser.add_argument('--gradient_accumulation_steps', type=int, default=5,
                         help="Number of updates steps to accumulate before performing a backward/update pass.")
     parser.add_argument("--learning_rate", default=5e-5, type=float,
                         help="The initial learning rate for Adam.")
@@ -257,7 +257,7 @@ def main():
                         help="Epsilon for Adam optimizer.")
     parser.add_argument("--max_grad_norm", default=1.0, type=float,
                         help="Max gradient norm.")
-    parser.add_argument("--num_train_epochs", default=3.0, type=float,
+    parser.add_argument("--num_train_epochs", default=1.0, type=float,
                         help="Total number of training epochs to perform.")
     parser.add_argument("--max_steps", default=-1, type=int,
                         help="If > 0: set total number of training steps to perform. Override num_train_epochs.")
@@ -326,10 +326,10 @@ def main():
 
 
     train_dataset = convert_features_to_dataset(convert_examples_to_features(
-        examples=train_eg, label2id=LABEL2ID, max_seq_length=50, tokenizer=tokenizer))
+        examples=train_eg, label2id=LABEL2ID, max_seq_length=30, tokenizer=tokenizer))
     
     dev_dataset = convert_features_to_dataset(convert_examples_to_features(
-        examples=dev_eg, label2id=LABEL2ID, max_seq_length=50, tokenizer=tokenizer))
+        examples=dev_eg, label2id=LABEL2ID, max_seq_length=40, tokenizer=tokenizer))
 
 
     config_class, model_class, tokenizer_class = MODEL_CLASSES[args.model_type]
