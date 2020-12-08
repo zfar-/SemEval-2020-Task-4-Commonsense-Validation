@@ -129,7 +129,7 @@ def train(args, train_dataset: TensorDataset, model, dev_dataset: TensorDataset=
                         new_result, pred_to_write = evaluate(args, dev_dataset, model)
                         if new_result > result:
                             result = new_result
-                            with open('./result/best.csv', 'w') as f:
+                            with open('SemEval-2020-Task-4-Commonsense-Validation/result/best.csv', 'w') as f:
                                 for i, r in enumerate(pred_to_write, 1):
                                     f.write('%d,%d\n' % (i, int(r)))
 
@@ -317,7 +317,7 @@ def main():
 
     d = DataProcessor()
     train_dir_path = 'SemEval-2020-Task-4-Commonsense-Validation/Training_Data'
-    dev_dir_path = 'SemEval-2020-Task-4-Commonsense-Validation/Trial_Data'
+    dev_dir_path = 'SemEval-2020-Task-4-Commonsense-Validation/Test_Data'
 
     dev_eg = d.get_dev_examples(dev_dir_path)
     train_eg = d.get_train_examples(train_dir_path)
