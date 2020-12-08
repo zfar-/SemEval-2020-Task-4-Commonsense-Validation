@@ -326,10 +326,10 @@ def main():
 
 
     train_dataset = convert_features_to_dataset(convert_examples_to_features(
-        examples=train_eg, label2id=LABEL2ID, max_seq_length=30, tokenizer=tokenizer))
+        examples=train_eg, label2id=LABEL2ID, max_seq_length=50, tokenizer=tokenizer))
     
     dev_dataset = convert_features_to_dataset(convert_examples_to_features(
-        examples=dev_eg, label2id=LABEL2ID, max_seq_length=30, tokenizer=tokenizer))
+        examples=dev_eg, label2id=LABEL2ID, max_seq_length=50, tokenizer=tokenizer))
 
 
     config_class, model_class, tokenizer_class = MODEL_CLASSES[args.model_type]
